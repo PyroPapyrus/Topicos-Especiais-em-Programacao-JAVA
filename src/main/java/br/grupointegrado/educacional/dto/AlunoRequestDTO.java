@@ -1,6 +1,6 @@
 package br.grupointegrado.educacional.dto;
 
-import java.sql.Date;
+import java.time.LocalDate;
 
-public record AlunoRequestDTO(String nome, String email, String matricula, Date data_nascimento) {
+public record AlunoRequestDTO(String nome, String email, String matricula, LocalDate data_nascimento) {
 }

@@ -2,7 +2,7 @@ package br.grupointegrado.educacional.model;
 
 import jakarta.persistence.*;
 
-import java.sql.Date;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "alunos")
@@ -22,7 +22,7 @@ public class Aluno {
     private String matricula;
 
     @Column
-    private Date data_nascimento;
+    private LocalDate data_nascimento;
 
     public Integer getId() {
         return id;
@@ -56,11 +56,11 @@ public class Aluno {
         this.matricula = matricula;
     }
 
-    public Date getData_nascimento() {
+    public LocalDate getData_nascimento() {
         return data_nascimento;
     }
 
-    public void setData_nascimento(Date data_nascimento) {
+    public void setData_nascimento(LocalDate data_nascimento) {
         this.data_nascimento = data_nascimento;
     }
 }
