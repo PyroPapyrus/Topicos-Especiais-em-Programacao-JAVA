@@ -19,7 +19,6 @@ public class ProfessorController {
 
     @GetMapping
     public ResponseEntity<List<Professor>> findAll(){
-//        return this.repository.findAll();
 
         return ResponseEntity.ok(this.repository.findAll());
 

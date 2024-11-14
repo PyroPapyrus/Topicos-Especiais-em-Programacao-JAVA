@@ -1,8 +1,11 @@
 package br.grupointegrado.educacional.controller;
 
 import br.grupointegrado.educacional.dto.CursoRequestDTO;
+import br.grupointegrado.educacional.dto.TurmaRequestDTO;
 import br.grupointegrado.educacional.model.Curso;
+import br.grupointegrado.educacional.model.Turma;
 import br.grupointegrado.educacional.repository.CursoRepository;
+import br.grupointegrado.educacional.repository.TurmaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +18,9 @@ public class CursoController {
 
     @Autowired
     private CursoRepository repository;
+
+    @Autowired
+    private TurmaRepository turmaRepository;
 
     @GetMapping
     public ResponseEntity<List<Curso>> findAll(){
@@ -66,6 +72,18 @@ public class CursoController {
 
         this.repository.delete(curso);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/add-turma")
+    public ResponseEntity<Curso> addTurma(@PathVariable Integer id,
+                                          @RequestBody Turma turma) {
+        Curso curso = this.repository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Curso não encontrado"));
+
+        turma.setCurso(curso);
+        this.turmaRepository.save(turma);
+
+        return ResponseEntity.ok(curso);
     }
 
 }
