@@ -26,6 +26,18 @@ public class Curso {
     @JsonIgnoreProperties("curso")
     private List<Turma> turmas;
 
+    @OneToMany(mappedBy = "curso")
+    @JsonIgnoreProperties("curso")
+    private List<Disciplina> disciplinas;
+
+    public List<Disciplina> getDisciplinas() {
+        return disciplinas;
+    }
+
+    public void setDisciplinas(List<Disciplina> disciplinas) {
+        this.disciplinas = disciplinas;
+    }
+
     public List<Turma> getTurmas() {
         return turmas;
     }

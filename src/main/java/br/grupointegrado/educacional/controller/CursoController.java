@@ -1,7 +1,6 @@
 package br.grupointegrado.educacional.controller;
 
-import br.grupointegrado.educacional.dto.CursoRequestDTO;
-import br.grupointegrado.educacional.dto.TurmaRequestDTO;
+import br.grupointegrado.educacional.dto.*;
 import br.grupointegrado.educacional.model.Curso;
 import br.grupointegrado.educacional.model.Turma;
 import br.grupointegrado.educacional.repository.CursoRepository;
@@ -23,22 +22,53 @@ public class CursoController {
     private TurmaRepository turmaRepository;
 
     @GetMapping
-    public ResponseEntity<List<Curso>> findAll(){
-//        return this.repository.findAll();
+    public ResponseEntity<List<CursoResponseDTO>> findAll() {
+        List<CursoResponseDTO> cursos = this.repository.findAll().stream()
+                .map(curso -> new CursoResponseDTO(
+                        curso.getId(),
+                        curso.getNome(),
+                        curso.getCodigo(),
+                        curso.getCarga_horaria(),
+                        curso.getDisciplinas().stream()
+                                .map(disciplina -> new DisciplinaSimplificada2DTO(
+                                        disciplina.getId(),
+                                        disciplina.getNome(),
+                                        disciplina.getCodigo(),
+                                        disciplina.getProfessor().getId(),
+                                        disciplina.getProfessor().getNome()
+                                ))
+                                .toList()
+                ))
+                .toList();
 
-        return ResponseEntity.ok(this.repository.findAll());
-
+        return ResponseEntity.ok(cursos);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Curso> findById(@PathVariable Integer id) {
 
+    @GetMapping("/{id}")
+    public ResponseEntity<CursoResponseDTO> findById(@PathVariable Integer id) {
         Curso curso = this.repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Curso não encontrado"));
 
-        return ResponseEntity.ok(curso);
+        CursoResponseDTO cursoResponse = new CursoResponseDTO(
+                curso.getId(),
+                curso.getNome(),
+                curso.getCodigo(),
+                curso.getCarga_horaria(),
+                curso.getDisciplinas().stream()
+                        .map(disciplina -> new DisciplinaSimplificada2DTO(
+                                disciplina.getId(),
+                                disciplina.getNome(),
+                                disciplina.getCodigo(),
+                                disciplina.getProfessor().getId(),
+                                disciplina.getProfessor().getNome()
+                        ))
+                        .toList()
+        );
 
+        return ResponseEntity.ok(cursoResponse);
     }
+
 
     @PostMapping
     public ResponseEntity<Curso> save(@RequestBody CursoRequestDTO dto) {
@@ -51,7 +81,9 @@ public class CursoController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Curso> update(@PathVariable Integer id, @RequestBody CursoRequestDTO dto) {
+    public ResponseEntity<CursoResponseDTO> update(
+            @PathVariable Integer id,
+            @RequestBody CursoRequestDTO dto) {
 
         Curso curso = this.repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Curso não encontrado"));
@@ -60,8 +92,27 @@ public class CursoController {
         curso.setCodigo(dto.codigo());
         curso.setCarga_horaria(dto.carga_horaria());
 
-        return  ResponseEntity.ok(this.repository.save(curso));
+        Curso cursoAtualizado = this.repository.save(curso);
+
+        CursoResponseDTO cursoResponse = new CursoResponseDTO(
+                cursoAtualizado.getId(),
+                cursoAtualizado.getNome(),
+                cursoAtualizado.getCodigo(),
+                cursoAtualizado.getCarga_horaria(),
+                cursoAtualizado.getDisciplinas().stream()
+                        .map(disciplina -> new DisciplinaSimplificada2DTO(
+                                disciplina.getId(),
+                                disciplina.getNome(),
+                                disciplina.getCodigo(),
+                                disciplina.getProfessor().getId(),
+                                disciplina.getProfessor().getNome()
+                        ))
+                        .toList()
+        );
+
+        return ResponseEntity.ok(cursoResponse);
     }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id) {
@@ -75,15 +126,28 @@ public class CursoController {
     }
 
     @PostMapping("/{id}/add-turma")
-    public ResponseEntity<Curso> addTurma(@PathVariable Integer id,
-                                          @RequestBody Turma turma) {
+    public ResponseEntity<TurmaResponseDTO> addTurma(@PathVariable Integer id,
+                                                     @RequestBody Turma turma) {
         Curso curso = this.repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Curso não encontrado"));
 
         turma.setCurso(curso);
-        this.turmaRepository.save(turma);
+        Turma turmaSalva = this.turmaRepository.save(turma);
 
-        return ResponseEntity.ok(curso);
+        TurmaResponseDTO turmaResponse = new TurmaResponseDTO(
+                turmaSalva.getId(),
+                turma.getAno(),
+                turma.getSemestre(),
+                new CursoSimplificadoDTO(
+                        curso.getId(),
+                        curso.getNome(),
+                        curso.getCodigo(),
+                        curso.getCarga_horaria()
+                )
+        );
+
+
+        return ResponseEntity.ok(turmaResponse);
     }
 
 }

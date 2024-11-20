@@ -1,8 +1,13 @@
 package br.grupointegrado.educacional.controller;
 
 
+import br.grupointegrado.educacional.dto.DisciplinaRequestDTO;
+import br.grupointegrado.educacional.dto.DisciplinaSimplificadaDTO;
 import br.grupointegrado.educacional.dto.ProfessorRequestDTO;
+import br.grupointegrado.educacional.dto.ProfessorResponseDTO;
+import br.grupointegrado.educacional.model.Disciplina;
 import br.grupointegrado.educacional.model.Professor;
+import br.grupointegrado.educacional.repository.DisciplinaRepository;
 import br.grupointegrado.educacional.repository.ProfessorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,22 +22,70 @@ public class ProfessorController {
     @Autowired
     private ProfessorRepository repository;
 
+    @Autowired
+    private DisciplinaRepository disciplinaRepository;
+
     @GetMapping
-    public ResponseEntity<List<Professor>> findAll(){
+    public ResponseEntity<List<ProfessorResponseDTO>> findAll() {
+        List<ProfessorResponseDTO> response = this.repository.findAll()
+                .stream()
+                .map(professor -> {
+                    List<DisciplinaSimplificadaDTO> disciplinas = professor.getDisciplinas()
+                            .stream()
+                            .map(disciplina -> new DisciplinaSimplificadaDTO(
+                                    disciplina.getId(),
+                                    disciplina.getNome(),
+                                    disciplina.getCodigo(),
+                                    disciplina.getCurso().getId(),
+                                    disciplina.getCurso().getNome(),
+                                    disciplina.getCurso().getCodigo()
+                            ))
+                            .toList();
 
-        return ResponseEntity.ok(this.repository.findAll());
+                    return new ProfessorResponseDTO(
+                            professor.getId(),
+                            professor.getNome(),
+                            professor.getEmail(),
+                            professor.getTelefone(),
+                            professor.getEspecialidade(),
+                            disciplinas
+                    );
+                })
+                .toList();
 
+        return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Professor> findById(@PathVariable Integer id) {
 
+    @GetMapping("/{id}")
+    public ResponseEntity<ProfessorResponseDTO> findById(@PathVariable Integer id) {
         Professor professor = this.repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Professor não encontrado"));
 
-        return ResponseEntity.ok(professor);
+        List<DisciplinaSimplificadaDTO> disciplinas = professor.getDisciplinas()
+                .stream()
+                .map(disciplina -> new DisciplinaSimplificadaDTO(
+                        disciplina.getId(),
+                        disciplina.getNome(),
+                        disciplina.getCodigo(),
+                        disciplina.getCurso().getId(),
+                        disciplina.getCurso().getNome(),
+                        disciplina.getCurso().getCodigo()
+                ))
+                .toList();
 
+        ProfessorResponseDTO response = new ProfessorResponseDTO(
+                professor.getId(),
+                professor.getNome(),
+                professor.getEmail(),
+                professor.getTelefone(),
+                professor.getEspecialidade(),
+                disciplinas
+        );
+
+        return ResponseEntity.ok(response);
     }
+
 
     @PostMapping
     public ResponseEntity<Professor> save(@RequestBody ProfessorRequestDTO dto) {
@@ -58,6 +111,7 @@ public class ProfessorController {
 
         return  ResponseEntity.ok(this.repository.save(professor));
     }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id) {
