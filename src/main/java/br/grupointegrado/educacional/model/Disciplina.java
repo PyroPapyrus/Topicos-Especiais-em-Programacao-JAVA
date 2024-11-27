@@ -27,6 +27,7 @@ public class Disciplina {
     @JsonIgnoreProperties("disciplina")
     private Professor professor;
 
+
     public Integer getId() {
         return id;
     }

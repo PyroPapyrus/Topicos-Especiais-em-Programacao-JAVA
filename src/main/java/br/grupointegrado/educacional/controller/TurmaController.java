@@ -176,28 +176,6 @@ public class TurmaController {
 
     }
 
-//
-//    @PutMapping("/matricula/{id}")
-//    public ResponseEntity<Matricula> updateMatricula(@PathVariable Integer id,
-//                                                     @RequestBody Integer alunoId,
-//                                                     @RequestBody Integer turmaId) {
-//
-//        Matricula matricula = this.matriculaRepository.findById(id)
-//                .orElseThrow(() -> new IllegalArgumentException("Matricula não encontrado"));
-//
-//        Turma turma = this.repository.findById(turmaId)
-//                .orElseThrow(() -> new IllegalArgumentException("Turma não encontrado"));
-//
-//        Aluno aluno = this.alunoRepository.findById(alunoId)
-//                .orElseThrow(() -> new IllegalArgumentException("Aluno não encontrado"));
-//
-//
-//        matricula.setTurma(turma);
-//        matricula.setAluno(aluno);
-//
-//        return ResponseEntity.ok(this.matriculaRepository.save(matricula));
-//
-//    }
 
 
     @DeleteMapping("/matricula/{id}")

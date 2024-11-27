@@ -30,6 +30,18 @@ public class Aluno {
     @JsonIgnoreProperties("aluno")
     private List<Matricula>matriculas;
 
+    @OneToMany(mappedBy = "nota")
+    @JsonIgnoreProperties("matricula")
+    private List<Nota> nota;
+
+    public List<Nota> getNota() {
+        return nota;
+    }
+
+    public void setNota(List<Nota> nota) {
+        this.nota = nota;
+    }
+
     public List<Matricula> getMatriculas() {
         return matriculas;
     }

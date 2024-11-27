@@ -1,8 +1,15 @@
 package br.grupointegrado.educacional.controller;
 
 import br.grupointegrado.educacional.dto.AlunoRequestDTO;
+import br.grupointegrado.educacional.dto.NotaRequestDTO;
 import br.grupointegrado.educacional.model.Aluno;
+import br.grupointegrado.educacional.model.Disciplina;
+import br.grupointegrado.educacional.model.Matricula;
+import br.grupointegrado.educacional.model.Nota;
 import br.grupointegrado.educacional.repository.AlunoRepository;
+import br.grupointegrado.educacional.repository.DisciplinaRepository;
+import br.grupointegrado.educacional.repository.MatriculaRepository;
+import br.grupointegrado.educacional.repository.NotaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,9 +23,17 @@ public class AlunoController {
     @Autowired
     private AlunoRepository repository;
 
+    @Autowired
+    private NotaRepository notaRepository;
+
+    @Autowired
+    private MatriculaRepository matriculaRepository;
+
+    @Autowired
+    private DisciplinaRepository disciplinaRepository;
+
     @GetMapping
     public ResponseEntity<List<Aluno>> findAll(){
-//        return this.repository.findAll();
 
         return ResponseEntity.ok(this.repository.findAll());
 
@@ -70,4 +85,52 @@ public class AlunoController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/{matriculaId}/{disciplinaId}/add-nota")
+    public ResponseEntity<Nota> addNota(@PathVariable Integer matriculaId,
+                                        @PathVariable Integer disciplinaId,
+                                        @RequestBody NotaRequestDTO dto){
+        Matricula matricula = this.matriculaRepository.findById(matriculaId)
+                .orElseThrow(() -> new IllegalArgumentException("Matricula não encontrada"));
+
+        Disciplina disciplina = this.disciplinaRepository.findById(disciplinaId)
+                .orElseThrow(() -> new IllegalArgumentException("Disciplina não encontrada"));
+
+        Nota nota = new Nota();
+
+        nota.setNota(dto.nota());
+        nota.setDataLancamento(dto.dataLancamento());
+
+        nota.setMatricula(matricula);
+        nota.setDisciplina(disciplina);
+
+        return ResponseEntity.ok(this.notaRepository.save(nota));
+    }
+
+    @GetMapping("/nota")
+    public ResponseEntity<List<Nota>> findAllNota(){
+
+        return ResponseEntity.ok(this.notaRepository.findAll());
+
+    }
+
+    @GetMapping("/nota/{id}")
+    public ResponseEntity<Nota> findNotaById(@PathVariable Integer id) {
+
+        Nota nota = this.notaRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("nota não encontrado"));
+
+        return ResponseEntity.ok(nota);
+
+    }
+
+    @DeleteMapping("/nota/{id}")
+    public ResponseEntity<Void> deleteNota(@PathVariable Integer id) {
+
+        Nota nota = this.notaRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Nota não encontrado"));
+
+
+        this.notaRepository.delete(nota);
+        return ResponseEntity.noContent().build();
+    }
 }
