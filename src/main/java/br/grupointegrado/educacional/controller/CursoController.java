@@ -125,29 +125,5 @@ public class CursoController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/{id}/add-turma")
-    public ResponseEntity<TurmaResponseDTO> addTurma(@PathVariable Integer id,
-                                                     @RequestBody Turma turma) {
-        Curso curso = this.repository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Curso não encontrado"));
-
-        turma.setCurso(curso);
-        Turma turmaSalva = this.turmaRepository.save(turma);
-
-        TurmaResponseDTO turmaResponse = new TurmaResponseDTO(
-                turmaSalva.getId(),
-                turma.getAno(),
-                turma.getSemestre(),
-                new CursoSimplificadoDTO(
-                        curso.getId(),
-                        curso.getNome(),
-                        curso.getCodigo(),
-                        curso.getCarga_horaria()
-                )
-        );
-
-
-        return ResponseEntity.ok(turmaResponse);
-    }
 
 }
